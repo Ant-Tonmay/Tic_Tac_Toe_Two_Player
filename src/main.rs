@@ -47,24 +47,58 @@ fn ask_cordinates(current_alien: char, board: &Board) -> (usize, usize) {
 
         if cord.len() == 2 {
             let (row, col): (usize, usize) = (cord[0], cord[1]);
-            if row + 3 < 6 && col + 3 < 6 && board[row+3][col+3] == '-' {
-                return (row+3, col+3);
+            if row + 3 < 6 && col + 3 < 6 && board[row + 3][col + 3] == '-' {
+                return (row + 3, col + 3);
             }
         }
         println!("Invalid Input");
     }
 }
 
+fn find_winner(current_alien: char, board: &Board) -> bool {
+    let mut ans = false;
+
+    // Check rows (horizontal)
+    for i in 0..3 {
+        if (0..3).all(|j| board[i+3][j+3] == current_alien) {
+            return true;
+        }
+    }
+
+    // Check columns (vertical)
+    for j in 0..3 {
+        if (0..3).all(|i| board[i+3][j+3] == current_alien) {
+            return true;
+        }
+    }
+
+    // Check left-to-right diagonal
+    if (0..3).all(|i| board[i+3][i+3] == current_alien) {
+        return true;
+    }
+
+    // Check right-to-left diagonal
+    if (0..3).all(|i| board[i+3][2 - i+3] == current_alien) {
+        return true;
+    }
+
+    false
+}
 
 fn start_game(board: &mut Board) {
-    
     let mut current_alien = ALIEN_X;
 
     loop {
         println!("Currnet Board");
         print_board(&board);
-        let(row,col) = ask_cordinates(current_alien, &board);
-        board[row][col]=current_alien;
+        let (row, col) = ask_cordinates(current_alien, &board);
+        board[row][col] = current_alien;
+        if find_winner(current_alien, &board) {
+            print_board(&board);
+            println!("Alien {}  is the Winner!!", current_alien);
+            return;
+        }
+
         current_alien = if current_alien == ALIEN_X {
             ALIEN_O
         } else {
@@ -74,25 +108,27 @@ fn start_game(board: &mut Board) {
 }
 
 fn main() {
-    println!("
+    println!(
+        "
 ██╗░░██╗░█████╗░████████╗░█████╗░  ██╗░░██╗██╗░░░██╗████████╗██╗
 ██║░██╔╝██╔══██╗╚══██╔══╝██╔══██╗  ██║░██╔╝██║░░░██║╚══██╔══╝██║
 █████═╝░███████║░░░██║░░░███████║  █████═╝░██║░░░██║░░░██║░░░██║
 ██╔═██╗░██╔══██║░░░██║░░░██╔══██║  ██╔═██╗░██║░░░██║░░░██║░░░██║
 ██║░╚██╗██║░░██║░░░██║░░░██║░░██║  ██║░╚██╗╚██████╔╝░░░██║░░░██║
-╚═╝░░╚═╝╚═╝░░╚═╝░░░╚═╝░░░╚═╝░░╚═╝  ╚═╝░░╚═╝░╚═════╝░░░░╚═╝░░░╚═╝");
+╚═╝░░╚═╝╚═╝░░╚═╝░░░╚═╝░░░╚═╝░░╚═╝  ╚═╝░░╚═╝░╚═════╝░░░░╚═╝░░░╚═╝"
+    );
     println!();
-    println!("
+    println!(
+        "
 █▀█ █░█ █░░ █▀▀ █▀
-█▀▄ █▄█ █▄▄ ██▄ ▄█");
-
+█▀▄ █▄█ █▄▄ ██▄ ▄█"
+    );
 
     println!("1. 𝕰𝖆𝖈𝖍 𝖕𝖑𝖆𝖞𝖊𝖗 𝖜𝖎𝖑𝖑 𝖒𝖆𝖗𝖐 𝖙𝖍𝖊 𝖈𝖊𝖑𝖑 𝖚𝖘𝖎𝖓𝖌 (𝖗𝖔𝖜,𝖈𝖔𝖑) 𝖊𝖌 - (1,1)");
     println!("2. 𝕿𝖔 𝕾𝖙𝖔𝖕 𝖙𝖍𝖊 𝖌𝖆𝖒𝖊 𝖕𝖗𝖊𝖘𝖘 𝖈𝖙𝖗𝖑+𝖈");
 
-    
     let mut board: Board = init();
-    
+
     print_board(&board);
     start_game(&mut board);
 }
