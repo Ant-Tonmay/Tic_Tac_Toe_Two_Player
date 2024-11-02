@@ -35,19 +35,36 @@ fn print_board(board: &Board) {
         print!("\n");
     }
 }
+fn ask_cordinates(current_alien: char, board: &Board) -> (usize, usize) {
+    loop {
+        println!("Alien {} Mark your cell :(row,col)", current_alien);
+        let mut input = String::new();
+        io::stdin().read_line(&mut input);
+        let cord: Vec<usize> = input
+            .split_whitespace()
+            .map(|s| s.parse::<usize>().expect("Parse error"))
+            .collect();
 
+        if cord.len() == 2 {
+            let (row, col): (usize, usize) = (cord[0], cord[1]);
+            if row + 3 < 6 && col + 3 < 6 && board[row+3][col+3] == '-' {
+                return (row+3, col+3);
+            }
+        }
+        println!("Invalid Input");
+    }
+}
 
 
 fn start_game(board: &mut Board) {
     println!("**TO STOP THE GAME - CTRL+C**");
+    let mut current_alien = ALIEN_X;
 
     loop {
         println!("Currnet Board");
         print_board(&board);
-
-        let mut current_alien = ALIEN_X;
-       
-
+        let(row,col) = ask_cordinates(current_alien, &board);
+        board[row][col]=current_alien;
         current_alien = if current_alien == ALIEN_X {
             ALIEN_O
         } else {
